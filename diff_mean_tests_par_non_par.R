@@ -39,14 +39,31 @@ aov_residuals <- residuals(object = res.aov )
 shapiro.test(x = aov_residuals )
 
 # Pearson r
+library("ggpubr")
+ggqqplot(observed)
 
+ggscatter(my_data, x = "mpg", y = "wt", 
+          add = "reg.line", conf.int = TRUE, 
+          cor.coef = TRUE, cor.method = "pearson",
+          xlab = "Miles/(US) gallon", ylab = "Weight (1000 lbs)")
+
+res <- cor.test(observed, theoretical, 
+                method = "pearson")
+res
 
 # Nonparametric Counterpart
 
 # Wilcoxon signed-rank
+# H0:m=m0
+
+wilcox.test(observed, mu = 29, alternative = "two.sided")
 
 # Wilcoxon 2-sample rank-sum
 
+res <- wilcox.test(observed, theoretical)
+
 # Kruskal-Wallis
+
+kruskal.test(observed ~ theoretical, data = airquality)
 
 # Spearman ρ
