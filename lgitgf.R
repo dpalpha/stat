@@ -77,3 +77,15 @@ logitgof(ml$ses, fv, ord = TRUE) # set ord to TRUE to run ordinal instead of mul
 library(MASS)
 mod2 <- polr(ses ~ female + write + read, data = ml)
 logitgof(ml$ses, fitted(mod2), ord = TRUE)
+
+pvalues <- array(0, 1000)
+
+for (i in 1:1000) {
+	n <- 100
+	x <- rnorm(n)
+	xb <- x
+	pr <- exp(xb)/(1+exp(xb))
+	y <- 1*(runif(n) < pr)
+	mod <- glm(y~x, family=binomial)
+	pvalues[i] <- hoslem.test(mod$y, fitted(mod), g=10)$p.value
+}
