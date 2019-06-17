@@ -1,3 +1,4 @@
+
 library(reshape) # needed by logitgof
 logitgof <- function (obs, exp, g = 10, ord = FALSE) {
   DNAME <- paste(deparse(substitute(obs)), deparse(substitute(exp)), sep = ", ")
@@ -65,27 +66,17 @@ library(foreign) # just to download the example dataset
 
 # with the ordinal package
 library(ordinal)
-ml <- read.dta("http://www.ats.ucla.edu/stat/data/hsbdemo.dta")
-mod1 <- clm(ses ~ female + write + read, data = ml)
 
-# extract predicted probs for each level of outcome
-predprob <- data.frame(id = ml$id, female = ml$female, read = ml$read, write = ml$write)
-fv <- predict(mod1, newdata = predprob, type = "prob")$fit
-logitgof(ml$ses, fv, ord = TRUE) # set ord to TRUE to run ordinal instead of multinomial test
-
-# with MASS
-library(MASS)
-mod2 <- polr(ses ~ female + write + read, data = ml)
-logitgof(ml$ses, fitted(mod2), ord = TRUE)
 
 pvalues <- array(0, 1000)
 
 for (i in 1:1000) {
-	n <- 100
-	x <- rnorm(n)
-	xb <- x
-	pr <- exp(xb)/(1+exp(xb))
-	y <- 1*(runif(n) < pr)
-	mod <- glm(y~x, family=binomial)
-	pvalues[i] <- hoslem.test(mod$y, fitted(mod), g=10)$p.value
+  n <- 100
+  x <- rnorm(n)
+  xb <- x
+  pr <- exp(xb)/(1+exp(xb))
+  y <- 1*(runif(n) < pr)
+  mod <- glm(y~x, family=binomial)
+  pvalues[i] <- logitgof(mod$y, fitted(mod), g=10, ord = FALSE)$p.value
+  
 }
