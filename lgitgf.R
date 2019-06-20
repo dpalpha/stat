@@ -75,32 +75,15 @@ logitgof <- function (obs, exp, g = 10, ord = FALSE) {
 }
 
 
-
-
-head(dataset)
-
-mod <- glm(dataset$DEFAULT~dataset$ZATRUDNIENIE_WIELKOSC_WOE+
-             dataset$ZATRUDNIENIE_ZAWOD_WOE+
-             dataset$SUMA_ZAPYTN_WOE+
-             dataset$BIK_ZAP_POPRZ_WOE+dataset$STAN_CYWILNY_WOE, family=binomial)
-
-logitgof(dataset$DEFAULT, fitted(glm(dataset$DEFAULT~dataset$ZATRUDNIENIE_WIELKOSC_WOE+
-                               dataset$ZATRUDNIENIE_ZAWOD_WOE+
-                               dataset$SUMA_ZAPYTN_WOE+
-                               dataset$BIK_ZAP_POPRZ_WOE+dataset$STAN_CYWILNY_WOE, family=binomial)), 
-         g=10,ord = FALSE)$p.value
-
-
-
 dataset %>% 
   mutate(qater = floor_date(as.Date(APPLICATION_DATE, format =  "%d-%m-%Y"), "1 year")) %>% 
   group_by(qater) %>% 
   do(data.frame(
-    pval = logitgof(.$DEFAULT, fitted(glm(.$DEFAULT~.$ZATRUDNIENIE_WIELKOSC_WOE+
-                                            .$ZATRUDNIENIE_ZAWOD_WOE+
-                                            .$SUMA_ZAPYTN_WOE+
-                                            .$BIK_ZAP_POPRZ_WOE+
-                                            .$STAN_CYWILNY_WOE, family=binomial)),
+    pval = logitgof(.$DEFAULT, fitted(glm(.$DEFAULT~.$X1+
+                                            .$X2+
+                                            .$X3+
+                                            .$X4+
+                                            .$X5, family=binomial)),
                     g=10, ord = FALSE)$p.value
     
   ))
