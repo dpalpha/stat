@@ -1,4 +1,16 @@
 
+library('dplyr')
+library('lubridate')
+library('ordinal')
+library('ResourceSelection')
+library('generalhoslem')
+
+
+
+# Goodnes of Fit Tests for Logistic Regression Models
+# hypothesis that the observed and expected proportions are the same across all doses is rejected
+# H0: The models does not need interaction and non-linearity
+
 library(reshape) # needed by logitgof
 logitgof <- function (obs, exp, g = 10, ord = FALSE) {
   DNAME <- paste(deparse(substitute(obs)), deparse(substitute(exp)), sep = ", ")
@@ -62,11 +74,42 @@ logitgof <- function (obs, exp, g = 10, ord = FALSE) {
                  expected = expected, stddiffs = stddiffs), class = "htest")
 }
 
-library(foreign) # just to download the example dataset
 
-# with the ordinal package
-library(ordinal)
 
+
+head(dataset)
+
+mod <- glm(dataset$DEFAULT~dataset$ZATRUDNIENIE_WIELKOSC_WOE+
+             dataset$ZATRUDNIENIE_ZAWOD_WOE+
+             dataset$SUMA_ZAPYTN_WOE+
+             dataset$BIK_ZAP_POPRZ_WOE+dataset$STAN_CYWILNY_WOE, family=binomial)
+
+logitgof(dataset$DEFAULT, fitted(glm(dataset$DEFAULT~dataset$ZATRUDNIENIE_WIELKOSC_WOE+
+                               dataset$ZATRUDNIENIE_ZAWOD_WOE+
+                               dataset$SUMA_ZAPYTN_WOE+
+                               dataset$BIK_ZAP_POPRZ_WOE+dataset$STAN_CYWILNY_WOE, family=binomial)), 
+         g=10,ord = FALSE)$p.value
+
+
+
+dataset %>% 
+  mutate(qater = floor_date(as.Date(APPLICATION_DATE, format =  "%d-%m-%Y"), "1 year")) %>% 
+  group_by(qater) %>% 
+  do(data.frame(
+    pval = logitgof(.$DEFAULT, fitted(glm(.$DEFAULT~.$ZATRUDNIENIE_WIELKOSC_WOE+
+                                            .$ZATRUDNIENIE_ZAWOD_WOE+
+                                            .$SUMA_ZAPYTN_WOE+
+                                            .$BIK_ZAP_POPRZ_WOE+
+                                            .$STAN_CYWILNY_WOE, family=binomial)),
+                    g=10, ord = FALSE)$p.value
+    
+  ))
+
+
+
+# generalhoslem::logitgof(dataset$DEFAULT,fitted(mod),g=10)
+
+# hoslem.test(dataset$DEFAULT,fitted(mod),g=10)
 
 pvalues <- array(0, 1000)
 
