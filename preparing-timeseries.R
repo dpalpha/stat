@@ -26,4 +26,10 @@ dataset = dataset %>% mutate(
             'M9' = as.Date(datetime) %m+% months(9) <= Sys.Date(),
             'M12' = as.Date(datetime) %m+% months(12) <= Sys.Date(),
             'M18' = as.Date(datetime) %m+% months(18) <= Sys.Date(),
+            'diffd' = as.double(difftime(lubridate::ymd(as.Date(datetime)),lubridate::ymd(Sys.Date()),units = "days")),
+            'mos' = mos(as.Date(datetime), Sys.Date()),
+            'mob' = mos(as.Date(datetime), Sys.Date()),
+            'elapsed_months' = elapsed_months(as.Date(datetime), Sys.Date())
+    
+    
 )
